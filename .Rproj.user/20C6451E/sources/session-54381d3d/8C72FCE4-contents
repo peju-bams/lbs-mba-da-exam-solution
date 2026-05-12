@@ -1,0 +1,644 @@
+---\
+title: "Exploratory and Inferential Analysis of Customer Meal Preferences and Satisfaction at Peej Kitchen"\
+author: "Fagbemi Mary Olapeju"\
+date: today\
+format:\
+  html:\
+    theme: flatly\
+    toc: true\
+    code-fold: true\
+    self-contained: true\
+execute:\
+  echo: true\
+  warning: false\
+  message: false\
+---\
+\
+\# 1. Executive Summary\
+\
+Peej Kitchen is a home-made catering business that prepares and delivers Nigerian meals such as Jollof Rice, Fried Rice, Oha Soup, Egusi Soup, and Ogbono Soup. This case study uses primary survey data collected from 100 respondents in May 2026 to understand the factors influencing customer meal demand, meal preference, and overall satisfaction. The dataset includes customer income range, order frequency, most ordered meal, perceived affordability, likelihood of continued purchase after a price increase, taste/quality rating, delivery time rating, portion size rating, most important purchase factor, and overall satisfaction.\
+\
+The analysis applies five exploratory and inferential analytics techniques: exploratory data analysis, visualisation, hypothesis testing, correlation analysis, and regression analysis. The evidence from the survey is expected to help Peej Kitchen identify its most attractive meals, understand the main drivers of satisfaction, and prioritise operational improvements. The business recommendation is to protect taste and quality as the core competitive advantage, promote high-demand meals such as Jollof Rice, monitor price sensitivity carefully, and improve operational areas such as delivery experience and portion consistency where the data shows weaker ratings.\
+\
+\# 2. Professional Disclosure\
+\
+I am Fagbemi Mary Olapeju, the Owner of Peej Kitchen, a home-made catering business that prepares meals for customers and ensures that they are delivered safely and securely. Peej Kitchen serves a variety of Nigerian meals including Jollof Rice, Fried Rice, Oha Soup, Egusi Soup, Ogbono Soup, and other home-made dishes.\
+\
+The purpose of this analysis is to understand the factors that influence customer demand, meal preference, and customer satisfaction. As the owner of the business, I regularly make decisions about menu planning, pricing, meal quality, delivery experience, and customer retention. Therefore, the use of exploratory and inferential analytics is directly relevant to my day-to-day operations.\
+\
+\*\*Exploratory Data Analysis (EDA).\*\* EDA is relevant because it helps me understand the structure of my customer survey data, identify missing values, detect inconsistent responses, and summarise key customer patterns such as most ordered meals, order frequency, and satisfaction levels. This supports better decisions about what customers are buying and where the business may need improvement.\
+\
+\*\*Data Visualisation.\*\* Data visualisation is relevant because it allows me to communicate customer behaviour clearly. Charts showing meal preference, satisfaction levels, affordability perception, and key purchase factors can help me quickly identify which areas of the business need attention.\
+\
+\*\*Hypothesis Testing.\*\* Hypothesis testing is relevant because it allows me to test whether observed patterns in the data are statistically meaningful. For example, I can test whether taste/quality is significantly associated with overall customer satisfaction and whether satisfaction differs across meal categories.\
+\
+\*\*Correlation Analysis.\*\* Correlation analysis is relevant because it helps me understand the strength and direction of relationships between key customer experience variables such as taste, affordability, portion size, delivery time, price sensitivity, and satisfaction.\
+\
+\*\*Regression Analysis.\*\* Regression analysis is relevant because it helps me estimate which factors are the strongest predictors of overall customer satisfaction. This supports better business decisions on where Peej Kitchen should focus improvement efforts.\
+\
+\# 3. Data Collection and Sampling\
+\
+The primary dataset used for this study was collected through a customer survey designed by the owner of Peej Kitchen. The survey was administered using Google Forms and distributed mainly through WhatsApp and direct messages to customers.\
+\
+The sampling frame consisted of existing customers of Peej Kitchen, potential customers who had tasted the meals, and family and friends who were familiar with the business. The survey was collected around May 2026. A total of 100 responses were collected, which satisfies the minimum requirement of 100 observations for this case study.\
+\
+The survey captured customer views on income range, order frequency, most ordered meal, affordability, likelihood of continued purchase if prices increase, taste/quality rating, delivery time, portion size, most important factor influencing meal choice, and overall satisfaction.\
+\
+Participation was voluntary. Respondents were informed that their responses would be used anonymously for an MBA Data Analytics assignment. No personally identifiable information was used in the analysis, and the results are presented only in aggregated form. The dataset is treated as primary survey data collected directly from customers and people familiar with Peej Kitchen.\
+\
+\# 4. Data Description\
+\
+This section loads the data, standardises the column names, cleans inconsistent categories, and creates numeric scores from ordered survey responses. These numeric scores make it possible to run correlation and regression analysis.\
+\
+\`\`\`{r setup}\
+\# Uncomment and run once if any package is missing:\
+\# install.packages(c("tidyverse", "readxl", "janitor", "skimr", "naniar", "corrplot", "broom", "effectsize", "rstatix", "knitr", "kableExtra", "patchwork", "scales"))\
+\
+library(tidyverse)\
+library(readxl)\
+library(janitor)\
+library(skimr)\
+library(naniar)\
+library(corrplot)\
+library(broom)\
+library(effectsize)\
+library(rstatix)\
+library(knitr)\
+library(kableExtra)\
+library(patchwork)\
+library(scales)\
+\
+theme_set(theme_minimal(base_size = 12))\
+\`\`\`\
+\
+\`\`\`{r load-data}\
+\# The file should be placed in a folder called "data" beside this Quarto file.\
+\# If you are running this inside the ChatGPT sandbox, the fallback path also works.\
+file_path \<- if (file.exists("data/PEEJ KITCHEN (Responses).xlsx")) {\
+  "data/PEEJ KITCHEN (Responses).xlsx"\
+} else if (file.exists("PEEJ KITCHEN (Responses).xlsx")) {\
+  "PEEJ KITCHEN (Responses).xlsx"\
+} else {\
+  "/mnt/data/PEEJ KITCHEN (Responses).xlsx"\
+}\
+\
+peej_raw \<- read_excel(file_path)\
+\
+glimpse(peej_raw)\
+\`\`\`\
+\
+\`\`\`{r clean-data}\
+peej \<- peej_raw %\>%\
+  clean_names() %\>%\
+  rename(\
+    income_range = x1_what_is_your_monthly_income_range,\
+    order_frequency = x2_how_often_do_you_buy_home_made_meals_from_peej_kitchen,\
+    most_ordered_meal = x3_which_of_the_following_meals_do_you_order_most_often,\
+    affordability = x4_how_would_you_rate_the_affordability_of_our_meals,\
+    price_increase_likelihood = x5_if_the_price_increases_how_likely_are_you_to_continue_buying,\
+    taste_quality = x6_how_would_you_rate_the_taste_quality_of_the_meals,\
+    delivery_time = x7_how_would_you_rate_delivery_time,\
+    portion_size = x8_how_would_you_rate_portion_size,\
+    most_important_factor = x9_what_is_the_most_important_factor_influencing_your_choice_of_meal,\
+    overall_satisfaction = x10_how_satisfied_are_you_overall_with_our_meals\
+  ) %\>%\
+  mutate(\
+    across(where(is.character), \~ str_squish(.x)),\
+    order_frequency = case_when(\
+      order_frequency %in% c("1-2 Monthly", "1-2 times Monthly") \~ "1-2 times Monthly",\
+      order_frequency == "1–2 times a week" \~ "1-2 times a week",\
+      order_frequency == "3–5 times a week" \~ "3-5 times a week",\
+      TRUE \~ order_frequency\
+    ),\
+    taste_quality = case_when(\
+      taste_quality == "Neural" \~ "Neutral",\
+      TRUE \~ taste_quality\
+    ),\
+    affordability = case_when(\
+      affordability == "affordable" \~ "Affordable",\
+      TRUE \~ affordability\
+    ),\
+    portion_size = case_when(\
+      portion_size == "very Satisfying" \~ "Very Satisfying",\
+      TRUE \~ portion_size\
+    ),\
+    timestamp = case_when(\
+      inherits(timestamp, "POSIXct") \~ as.POSIXct(timestamp),\
+      inherits(timestamp, "Date") \~ as.POSIXct(timestamp),\
+      is.numeric(timestamp) \~ as.POSIXct((as.numeric(timestamp) - 25569) \* 86400, origin = "1970-01-01", tz = "Africa/Lagos"),\
+      TRUE \~ suppressWarnings(as.POSIXct(timestamp, tz = "Africa/Lagos"))\
+    ),\
+    response_date = as.Date(timestamp)\
+  ) %\>%\
+  mutate(\
+    satisfaction_score = case_when(\
+      overall_satisfaction == "Very Dissatisfied" \~ 1,\
+      overall_satisfaction == "Dissatisfied" \~ 2,\
+      overall_satisfaction == "Neutral" \~ 3,\
+      overall_satisfaction == "Satisfied" \~ 4,\
+      overall_satisfaction == "Very Satisfied" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    quality_score = case_when(\
+      taste_quality == "Poor" \~ 1,\
+      taste_quality == "Fair" \~ 2,\
+      taste_quality == "Neutral" \~ 3,\
+      taste_quality == "Good" \~ 4,\
+      taste_quality == "Excellent" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    affordability_score = case_when(\
+      affordability == "Very Expensive" \~ 1,\
+      affordability == "Expensive" \~ 2,\
+      affordability == "Moderate" \~ 3,\
+      affordability == "Affordable" \~ 4,\
+      affordability == "Very Affordable" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    price_sensitivity_score = case_when(\
+      price_increase_likelihood == "Very unlikely" \~ 1,\
+      price_increase_likelihood == "Unlikely" \~ 2,\
+      price_increase_likelihood == "Neutral" \~ 3,\
+      price_increase_likelihood == "Likely" \~ 4,\
+      price_increase_likelihood == "Very likely" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    delivery_score = case_when(\
+      delivery_time == "Very Slow" \~ 1,\
+      delivery_time == "Slow" \~ 2,\
+      delivery_time == "Neutral" \~ 3,\
+      delivery_time == "Fast" \~ 4,\
+      delivery_time == "Very fast" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    portion_score = case_when(\
+      portion_size == "Too small" \~ 1,\
+      portion_size == "Small" \~ 2,\
+      portion_size == "Neutral" \~ 3,\
+      portion_size == "Satisfying" \~ 4,\
+      portion_size == "Very Satisfying" \~ 5,\
+      TRUE \~ NA_real\_\
+    ),\
+    order_frequency_score = case_when(\
+      order_frequency == "Occasionally" \~ 1,\
+      order_frequency == "1-2 times Monthly" \~ 2,\
+      order_frequency == "1-2 times a week" \~ 3,\
+      order_frequency == "3-5 times a week" \~ 4,\
+      TRUE \~ NA_real\_\
+    ),\
+    income_score = case_when(\
+      income_range == "Below ₦50,000" \~ 1,\
+      income_range == "₦50,000 – ₦100,000" \~ 2,\
+      income_range == "₦100,000 – ₦200,000" \~ 3,\
+      income_range == "Above ₦200,000" \~ 4,\
+      TRUE \~ NA_real\_\
+    )\
+  )\
+\`\`\`\
+\
+\`\`\`{r variable-table}\
+variable_description \<- tibble::tribble(\
+  \~Variable, \~Type, \~BusinessMeaning,\
+  "response_date", "Date", "Date the survey response was submitted",\
+  "income_range", "Categorical / ordinal", "Customer monthly income group",\
+  "order_frequency", "Categorical / ordinal", "How often customers buy home-made meals from Peej Kitchen",\
+  "most_ordered_meal", "Categorical", "Meal ordered most often by the respondent",\
+  "affordability", "Categorical / ordinal", "Customer perception of meal affordability",\
+  "price_increase_likelihood", "Categorical / ordinal", "Likelihood of continued purchase after price increase",\
+  "taste_quality", "Categorical / ordinal", "Customer rating of taste and meal quality",\
+  "delivery_time", "Categorical / ordinal", "Customer rating of delivery time",\
+  "portion_size", "Categorical / ordinal", "Customer rating of meal portion size",\
+  "most_important_factor", "Categorical", "Main factor influencing meal choice",\
+  "overall_satisfaction", "Categorical / ordinal", "Overall customer satisfaction rating"\
+)\
+\
+variable_description %\>%\
+  kable(caption = "Description of Variables in the Peej Kitchen Survey") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\`\`\`{r sample-size}\
+tibble(\
+  metric = c("Number of observations", "Number of variables", "Earliest response date", "Latest response date"),\
+  value = c(nrow(peej), ncol(peej_raw), min(peej\$response_date, na.rm = TRUE), max(peej\$response_date, na.rm = TRUE))\
+) %\>%\
+  kable(caption = "Dataset Size and Survey Period") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\# 5. Analysis Technique 1: Exploratory Data Analysis\
+\
+\## Brief theory recap\
+\
+Exploratory Data Analysis is the process of examining the dataset before formal modelling. It helps the analyst understand data structure, missing values, data quality problems, distributions, and early patterns. For Peej Kitchen, EDA helps answer basic operational questions such as: Which meals are most ordered? How satisfied are customers? Are there inconsistent responses that need cleaning before analysis?\
+\
+\## Business justification\
+\
+Peej Kitchen needs to understand the current state of customer demand and satisfaction before making decisions about pricing, promotion, menu improvement, and delivery operations. EDA is appropriate because this is survey data with a mix of categorical and ordinal variables.\
+\
+\`\`\`{r eda-overview}\
+skim(peej)\
+\`\`\`\
+\
+\`\`\`{r missing-values}\
+miss_var_summary(peej) %\>%\
+  kable(caption = "Missing Value Summary") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\`\`\`{r category-counts}\
+meal_counts \<- peej %\>%\
+  count(most_ordered_meal, sort = TRUE) %\>%\
+  mutate(percent = n / sum(n))\
+\
+factor_counts \<- peej %\>%\
+  count(most_important_factor, sort = TRUE) %\>%\
+  mutate(percent = n / sum(n))\
+\
+satisfaction_counts \<- peej %\>%\
+  count(overall_satisfaction, sort = TRUE) %\>%\
+  mutate(percent = n / sum(n))\
+\
+meal_counts %\>%\
+  mutate(percent = percent(percent, accuracy = 0.1)) %\>%\
+  kable(caption = "Most Ordered Meals") %\>%\
+  kable_styling(full_width = FALSE)\
+\
+factor_counts %\>%\
+  mutate(percent = percent(percent, accuracy = 0.1)) %\>%\
+  kable(caption = "Most Important Factors Influencing Meal Choice") %\>%\
+  kable_styling(full_width = FALSE)\
+\
+satisfaction_counts %\>%\
+  mutate(percent = percent(percent, accuracy = 0.1)) %\>%\
+  kable(caption = "Overall Satisfaction Distribution") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\`\`\`{r numeric-summary}\
+peej %\>%\
+  summarise(\
+    average_satisfaction = mean(satisfaction_score, na.rm = TRUE),\
+    average_quality = mean(quality_score, na.rm = TRUE),\
+    average_affordability = mean(affordability_score, na.rm = TRUE),\
+    average_price_continuity = mean(price_sensitivity_score, na.rm = TRUE),\
+    average_delivery = mean(delivery_score, na.rm = TRUE),\
+    average_portion = mean(portion_score, na.rm = TRUE),\
+    average_order_frequency = mean(order_frequency_score, na.rm = TRUE)\
+  ) %\>%\
+  pivot_longer(everything(), names_to = "metric", values_to = "average_score") %\>%\
+  mutate(average_score = round(average_score, 2)) %\>%\
+  kable(caption = "Average Scores for Ordinal Survey Variables") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\## Data quality issues and treatment\
+\
+The EDA revealed the following data quality issues:\
+\
+ 1. Some response categories were written inconsistently. For example, \`1-2 Monthly\` and \`1-2 times Monthly\` both describe the same order frequency category. These were standardised into one category.\
+2. Some text responses contained spelling or capitalisation inconsistencies. For example, \`Neural\` was corrected to \`Neutral\`, \`affordable\` was corrected to \`Affordable\`, and \`very Satisfying\` was corrected to \`Very Satisfying\`.\
+3. The survey variables were mainly categorical or ordinal. For correlation and regression analysis, ordered categories were converted into numeric scores in a transparent way.\
+\
+\## Plain-language interpretation\
+\
+The EDA gives Peej Kitchen a clear first picture of customer behaviour. The frequency tables show which meals customers order most often and which factors customers consider most important when choosing meals. The satisfaction table also shows whether the business is generally performing well or whether many customers are neutral or dissatisfied. These results create the foundation for the visualisation, hypothesis testing, correlation, and regression sections.\
+\
+\# 6. Analysis Technique 2: Data Visualisation\
+\
+\## Brief theory recap\
+\
+Data visualisation uses charts to communicate patterns in a dataset. The goal is not only to produce graphs but to tell a clear business story. For this case, the visualisation story focuses on demand, satisfaction, and the customer experience factors that may influence repeat purchases.\
+\
+\## Business justification\
+\
+For a catering business, charts are useful because they quickly show which meals are popular, what customers value, and where operational weaknesses may exist. Visualisations are especially helpful for making decisions about menu focus, quality control, pricing, and delivery improvement.\
+\
+\`\`\`{r visualisation-plots, fig.height=12, fig.width=12}\
+p1 \<- ggplot(peej, aes(x = fct_infreq(most_ordered_meal))) +\
+  geom_bar(fill = "#2C7FB8") +\
+  coord_flip() +\
+  labs(\
+    title = "Most Frequently Ordered Meals",\
+    x = "Meal",\
+    y = "Number of Respondents"\
+  )\
+\
+p2 \<- ggplot(peej, aes(x = fct_infreq(most_important_factor))) +\
+  geom_bar(fill = "#41AB5D") +\
+  coord_flip() +\
+  labs(\
+    title = "Main Factor Influencing Meal Choice",\
+    x = "Factor",\
+    y = "Number of Respondents"\
+  )\
+\
+p3 \<- ggplot(peej, aes(x = overall_satisfaction)) +\
+  geom_bar(fill = "#F16913") +\
+  labs(\
+    title = "Overall Customer Satisfaction",\
+    x = "Satisfaction Level",\
+    y = "Number of Respondents"\
+  )\
+\
+p4 \<- ggplot(peej, aes(x = affordability)) +\
+  geom_bar(fill = "#756BB1") +\
+  coord_flip() +\
+  labs(\
+    title = "Perceived Affordability of Meals",\
+    x = "Affordability Rating",\
+    y = "Number of Respondents"\
+  )\
+\
+p5 \<- ggplot(peej, aes(x = quality_score, y = satisfaction_score)) +\
+  geom_jitter(width = 0.15, height = 0.15, alpha = 0.55, colour = "#08519C") +\
+  geom_smooth(method = "lm", se = TRUE, colour = "#DE2D26") +\
+  labs(\
+    title = "Taste/Quality and Satisfaction",\
+    x = "Taste/Quality Score",\
+    y = "Satisfaction Score"\
+  )\
+\
+(p1 \| p2) / (p3 \| p4) / p5 +\
+  plot_annotation(title = "Customer Demand and Satisfaction Story for Peej Kitchen")\
+\`\`\`\
+\
+\`\`\`{r satisfaction-by-meal, fig.height=6, fig.width=9}\
+ggplot(peej, aes(x = fct_reorder(most_ordered_meal, satisfaction_score, .fun = median), y = satisfaction_score)) +\
+  geom_boxplot(fill = "#9ECAE1") +\
+  coord_flip() +\
+  labs(\
+    title = "Satisfaction Score by Most Ordered Meal",\
+    x = "Meal",\
+    y = "Satisfaction Score"\
+  )\
+\`\`\`\
+\
+\## Plain-language interpretation\
+\
+The visualisations help Peej Kitchen understand the demand story. The meal chart identifies the most frequently ordered meals, while the purchase-factor chart shows the main reasons customers choose meals. The satisfaction and affordability charts show how customers feel about the business overall. The relationship plot between taste/quality and satisfaction is especially important because it visually indicates whether customers who rate quality highly also tend to report higher satisfaction.\
+\
+\# 7. Analysis Technique 3: Hypothesis Testing\
+\
+\## Brief theory recap\
+\
+Hypothesis testing is used to determine whether an observed relationship or difference in the sample is likely to reflect a real pattern in the wider customer population. The null hypothesis usually states that there is no relationship or no difference, while the alternative hypothesis states that a relationship or difference exists.\
+\
+\## Business justification\
+\
+Peej Kitchen should not rely only on visual impressions. Hypothesis testing helps the business determine whether customer satisfaction is statistically associated with quality or whether satisfaction differs across meals. This supports more evidence-based decisions about quality improvement and menu strategy.\
+\
+\## Hypothesis Test 1: Taste/Quality and Overall Satisfaction\
+\
+\*\*Null hypothesis (H₀):\*\* Taste/quality rating and overall satisfaction are independent.\
+\
+\*\*Alternative hypothesis (H₁):\*\* Taste/quality rating and overall satisfaction are associated.\
+\
+Because both variables are categorical/ordinal, a chi-square test of independence is appropriate. If expected counts are too small, a simulated p-value is used to make the test more reliable.\
+\
+\`\`\`{r hypothesis-test-1}\
+quality_satisfaction_table \<- table(peej\$taste_quality, peej\$overall_satisfaction)\
+quality_satisfaction_table\
+\
+chisq_initial \<- chisq.test(quality_satisfaction_table)\
+use_simulated_p \<- any(chisq_initial\$expected \< 5)\
+\
+chisq_quality \<- chisq.test(\
+  quality_satisfaction_table,\
+  simulate.p.value = use_simulated_p,\
+  B = 10000\
+)\
+\
+chisq_quality\
+\
+cramers_v_result \<- cramers_v(quality_satisfaction_table)\
+cramers_v_result\
+\`\`\`\
+\
+\`\`\`{r hypothesis-test-1-tidy}\
+tibble(\
+  test = "Chi-square test: Taste/Quality vs Overall Satisfaction",\
+  statistic = round(unname(chisq_quality\$statistic), 3),\
+  p_value = round(chisq_quality\$p.value, 4),\
+  simulated_p_value_used = use_simulated_p,\
+  cramers_v = round(as.numeric(cramers_v_result\$Cramers_v), 3)\
+) %\>%\
+  kable(caption = "Hypothesis Test 1 Result") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\## Interpretation of Test 1\
+\
+If the p-value is below 0.05, the result suggests that taste/quality and overall satisfaction are significantly associated. In business terms, this would mean that customers' perception of taste and quality is not just a casual opinion; it is meaningfully connected to how satisfied they are with Peej Kitchen. If the p-value is above 0.05, the sample does not provide enough statistical evidence to conclude that taste/quality and satisfaction are associated, although quality may still remain operationally important.\
+\
+\## Hypothesis Test 2: Satisfaction Across Meal Categories\
+\
+\*\*Null hypothesis (H₀):\*\* Overall satisfaction scores are the same across meal categories.\
+\
+\*\*Alternative hypothesis (H₁):\*\* At least one meal category has a different satisfaction score.\
+\
+The Kruskal-Wallis test is appropriate because satisfaction score is ordinal and the comparison involves more than two meal groups.\
+\
+\`\`\`{r hypothesis-test-2}\
+kruskal_meal \<- kruskal.test(satisfaction_score \~ most_ordered_meal, data = peej)\
+kruskal_meal\
+\
+kruskal_effect \<- peej %\>%\
+  kruskal_effsize(satisfaction_score \~ most_ordered_meal)\
+\
+kruskal_effect\
+\`\`\`\
+\
+\`\`\`{r hypothesis-test-2-tidy}\
+tibble(\
+  test = "Kruskal-Wallis test: Satisfaction across meals",\
+  statistic = round(unname(kruskal_meal\$statistic), 3),\
+  p_value = round(kruskal_meal\$p.value, 4),\
+  effect_size_epsilon_squared = round(kruskal_effect\$effsize, 3),\
+  effect_size_magnitude = kruskal_effect\$magnitude\
+) %\>%\
+  kable(caption = "Hypothesis Test 2 Result") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\## Interpretation of Test 2\
+\
+If the p-value is below 0.05, it suggests that satisfaction differs significantly across the meals. This would mean Peej Kitchen should investigate which meals produce higher or lower satisfaction and use that insight for menu improvement. If the p-value is above 0.05, the data does not provide strong evidence that satisfaction differs by meal type, meaning customer satisfaction may be driven more by general service factors such as taste, delivery, affordability, and portion size than by meal category alone.\
+\
+\# 8. Analysis Technique 4: Correlation Analysis\
+\
+\## Brief theory recap\
+\
+Correlation analysis measures the direction and strength of association between numeric variables. Because the Peej Kitchen survey variables are ordinal scores, Spearman correlation is used. Spearman correlation is suitable when variables are ranked or ordinal and when the relationship may not be perfectly linear.\
+\
+\## Business justification\
+\
+Correlation analysis helps Peej Kitchen identify which customer experience variables move together. For example, if taste/quality is strongly correlated with satisfaction, the business should treat meal quality as a priority. If affordability is strongly correlated with willingness to continue buying after a price increase, pricing strategy should be handled carefully.\
+\
+\`\`\`{r correlation-analysis}\
+numeric_data \<- peej %\>%\
+  select(\
+    satisfaction_score,\
+    quality_score,\
+    affordability_score,\
+    price_sensitivity_score,\
+    delivery_score,\
+    portion_score,\
+    order_frequency_score,\
+    income_score\
+  )\
+\
+cor_matrix \<- cor(numeric_data, use = "complete.obs", method = "spearman")\
+round(cor_matrix, 2)\
+\`\`\`\
+\
+\`\`\`{r correlation-heatmap, fig.height=7, fig.width=9}\
+corrplot(\
+  cor_matrix,\
+  method = "color",\
+  type = "upper",\
+  addCoef.col = "black",\
+  tl.col = "black",\
+  tl.srt = 45,\
+  number.cex = 0.7\
+)\
+\`\`\`\
+\
+\`\`\`{r strongest-correlations}\
+strong_correlations \<- as.data.frame(as.table(cor_matrix)) %\>%\
+  rename(variable_1 = Var1, variable_2 = Var2, correlation = Freq) %\>%\
+  filter(variable_1 != variable_2) %\>%\
+  mutate(pair = map2_chr(as.character(variable_1), as.character(variable_2), \~ paste(sort(c(.x, .y)), collapse = "---"))) %\>%\
+  distinct(pair, .keep_all = TRUE) %\>%\
+  mutate(abs_correlation = abs(correlation)) %\>%\
+  arrange(desc(abs_correlation)) %\>%\
+  select(variable_1, variable_2, correlation) %\>%\
+  mutate(correlation = round(correlation, 3))\
+\
+head(strong_correlations, 10) %\>%\
+  kable(caption = "Top Correlations Among Customer Experience Variables") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\## Plain-language interpretation\
+\
+The correlation matrix shows the relationships between customer experience factors. A positive correlation means that as one score increases, the other tends to increase. For example, a positive relationship between quality score and satisfaction score would suggest that customers who give higher ratings to meal quality also tend to give higher overall satisfaction ratings. However, correlation does not prove causation. To confirm causality, Peej Kitchen would need a stronger design, such as tracking satisfaction before and after a deliberate quality improvement or price change.\
+\
+\# 9. Analysis Technique 5: Regression Analysis\
+\
+\## Brief theory recap\
+\
+Regression analysis estimates how a dependent variable changes when predictor variables change. In this study, linear regression is used to estimate how taste/quality, affordability, price sensitivity, delivery time, portion size, income, and order frequency are associated with overall satisfaction.\
+\
+Although satisfaction is an ordinal survey score, it is treated as an approximate numeric outcome for this business analytics exercise. The model is interpreted cautiously as an explanatory tool rather than a perfect causal model.\
+\
+\## Business justification\
+\
+Regression is useful because Peej Kitchen needs to know which business factors are most strongly associated with satisfaction after accounting for other factors. This supports prioritisation. For example, if quality has the strongest positive coefficient, quality improvement should receive more management attention than less influential factors.\
+\
+\`\`\`{r regression-model}\
+satisfaction_model \<- lm(\
+  satisfaction_score \~ quality_score +\
+    affordability_score +\
+    price_sensitivity_score +\
+    delivery_score +\
+    portion_score +\
+    order_frequency_score +\
+    income_score,\
+  data = peej\
+)\
+\
+summary(satisfaction_model)\
+\`\`\`\
+\
+\`\`\`{r regression-tidy}\
+model_results \<- tidy(satisfaction_model, conf.int = TRUE) %\>%\
+  mutate(\
+    estimate = round(estimate, 3),\
+    std.error = round(std.error, 3),\
+    statistic = round(statistic, 3),\
+    p.value = round(p.value, 4),\
+    conf.low = round(conf.low, 3),\
+    conf.high = round(conf.high, 3)\
+  )\
+\
+model_results %\>%\
+  kable(caption = "Regression Coefficients Predicting Overall Satisfaction") %\>%\
+  kable_styling(full_width = FALSE)\
+\
+glance(satisfaction_model) %\>%\
+  select(r.squared, adj.r.squared, sigma, statistic, p.value, df, df.residual) %\>%\
+  mutate(across(where(is.numeric), \~ round(.x, 4))) %\>%\
+  kable(caption = "Regression Model Fit") %\>%\
+  kable_styling(full_width = FALSE)\
+\`\`\`\
+\
+\`\`\`{r regression-diagnostics, fig.height=8, fig.width=8}\
+par(mfrow = c(2, 2))\
+plot(satisfaction_model)\
+par(mfrow = c(1, 1))\
+\`\`\`\
+\
+\## Plain-language interpretation\
+\
+The regression output should be interpreted by focusing on the sign, size, and p-value of each coefficient.\
+\
+ - A positive coefficient means that an increase in that factor is associated with higher satisfaction, holding the other factors constant.\
+ - A negative coefficient means that an increase in that factor is associated with lower satisfaction, holding the other factors constant.\
+ - A p-value below 0.05 suggests that the factor is statistically significant in this model.\
+ - The R-squared value shows the percentage of variation in satisfaction explained by the predictors included in the model.\
+\
+For managerial decision-making, the most important predictors are the ones with meaningful positive coefficients and statistically significant p-values. If taste/quality is significant, Peej Kitchen should maintain strict quality control, recipe consistency, and ingredient standards. If delivery or portion size is significant, then operational improvements in dispatch timing or portion standardisation should be prioritised.\
+\
+\# 10. Integrated Findings\
+\
+The five analytical techniques work together to give a complete picture of Peej Kitchen's customer experience.\
+\
+EDA summarised the customer survey and identified data quality issues that needed correction before analysis. Visualisation showed the main demand and satisfaction patterns in an easy-to-understand way. Hypothesis testing provided formal statistical evidence about whether quality and meal type are associated with satisfaction. Correlation analysis showed which customer experience variables move together. Regression analysis then combined the main predictors into one model to estimate which factors best explain overall satisfaction.\
+\
+The overall recommendation is that Peej Kitchen should treat taste and meal quality as its main competitive advantage, while also monitoring affordability, price sensitivity, delivery experience, and portion size. The business should continue promoting high-demand meals, especially the meals with strong order counts and high satisfaction, while improving any meal or service area that shows lower ratings.\
+\
+A practical action plan is:\
+\
+ 1. Maintain quality consistency by standardising recipes, cooking process, and ingredient selection.\
+2. Use Jollof Rice and other high-demand meals as flagship offerings in promotions.\
+3. Avoid sudden price increases; if prices must increase, communicate the reason clearly and consider bundle options.\
+4. Monitor delivery time and portion size because these affect the total customer experience.\
+5. Repeat this survey periodically to track changes in customer satisfaction and demand over time.\
+\
+\# 11. Limitations and Further Work\
+\
+This study has some limitations. First, the sample size is 100, which is acceptable for the assignment but still limited for making broad conclusions about all potential customers. Second, the survey includes existing customers, potential customers, family, and friends, which may introduce response bias because some respondents may be more favourable toward the business. Third, most variables are ordinal categories, meaning that converting them to numeric scores requires judgement. Fourth, the analysis is based on self-reported survey responses rather than actual transaction records.\
+\
+With more time and data, Peej Kitchen could improve the analysis by combining survey responses with actual sales records, delivery logs, repeat purchase history, and customer complaints. The business could also collect data over several months to study seasonality and repeat buying behaviour. A future study could use logistic regression to predict whether a customer is likely to continue buying after a price increase or use customer segmentation to identify different customer groups.\
+\
+\# References\
+\
+Adi, B. (2026). \*AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R\*. Lagos Business School / markanalytics.online. https://markanalytics.online\
+\
+Allaire, J. J., Teague, C., Scheidegger, C., Xie, Y., & Dervieux, C. (2022). \*Quarto\* (Version 1.x) \[Computer software\]. https://doi.org/10.5281/zenodo.5960048\
+\
+Fagbemi, M. O. (2026). \*Peej Kitchen customer meal preference and satisfaction survey\* \[Survey instrument and dataset\]. Administered to existing customers, potential customers, family, and friends, May 2026. Ethical clearance: Respondents were informed that responses would be used anonymously for an MBA analytics assignment.\
+\
+R Core Team. (2024). \*R: A language and environment for statistical computing\* (Version 4.x). R Foundation for Statistical Computing. https://www.R-project.org/\
+\
+Wickham, H. (2016). \*ggplot2: Elegant graphics for data analysis\*. Springer. https://doi.org/10.1007/978-3-319-24277-4\
+\
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. \*Journal of Open Source Software, 4\*(43), 1686. https://doi.org/10.21105/joss.01686\
+\
+\# Appendix: AI Usage Statement\
+\
+I used ChatGPT as an AI coding and writing assistant to support the structure of the Quarto document, suggest R code for data cleaning and analysis, and improve the clarity of the business interpretation. I made the final analytical decisions, including the selection of the Peej Kitchen business problem, the choice of variables, the interpretation of outputs, and the business recommendations. The dataset was collected independently through a Google Forms survey administered to customers and people familiar with Peej Kitchen.\
+\
+\# Appendix: Defence Preparation Notes\
+\
+For the oral defence, I should be able to explain the following:\
+\
+ 1. \*\*Why this dataset is real primary data:\*\* It was collected through Google Forms from customers, potential customers, family, and friends familiar with Peej Kitchen.\
+2. \*\*Why EDA was used:\*\* It helped me understand the structure, missing values, inconsistencies, and basic patterns in the survey data.\
+3. \*\*Why visualisation was used:\*\* It helped communicate meal preference, satisfaction, affordability, and quality patterns clearly.\
+4. \*\*Why hypothesis testing was used:\*\* It helped test whether relationships in the sample are statistically meaningful.\
+5. \*\*Why Spearman correlation was used:\*\* The survey variables are ordinal scores, so Spearman is more appropriate than Pearson.\
+6. \*\*Why regression was used:\*\* It helped estimate which customer experience factors predict overall satisfaction.\
+7. \*\*Main business implication:\*\* Peej Kitchen should protect taste/quality as its main advantage while improving delivery, portion consistency, and price communication.\
+ 
