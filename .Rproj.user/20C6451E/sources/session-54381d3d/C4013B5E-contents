@@ -6,19 +6,210 @@ format:
   html:
     theme: flatly
     toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
     code-fold: true
+    code-tools: true
+    code-summary: "Show code"
+    smooth-scroll: true
     self-contained: true
+    fig-align: center
+    df-print: paged
 execute:
   echo: true
   warning: false
   message: false
 ---
 
+```{=html}
+<style>
+/*
+  Clean RPubs-style academic report design.
+  The goal is a calm, readable, examiner-friendly HTML page:
+  clear headings, tidy tables, visible sections, and minimal decoration.
+*/
+:root {
+  --brand-navy: #1f4e79;
+  --brand-blue: #2f75b5;
+  --brand-soft: #eef5fb;
+  --brand-border: #d8e6f3;
+  --ink: #222831;
+  --muted: #5f6b77;
+  --table-stripe: #f7fafd;
+  --page-bg: #fbfcfe;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+#quarto-content {
+  background: #ffffff;
+}
+
+main.content {
+  background: #ffffff;
+  border: 1px solid #e8eef5;
+  border-radius: 10px;
+  padding: 2rem 2.4rem;
+  box-shadow: 0 8px 28px rgba(31, 78, 121, 0.06);
+}
+
+.quarto-title-block {
+  border-bottom: 4px solid var(--brand-blue);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.quarto-title h1.title {
+  color: var(--brand-navy);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+
+.quarto-title-meta {
+  color: var(--muted);
+}
+
+h1, h2, h3, h4 {
+  color: var(--brand-navy);
+  font-weight: 700;
+}
+
+h1 {
+  border-bottom: 2px solid var(--brand-border);
+  padding-bottom: 0.35rem;
+  margin-top: 2.2rem;
+}
+
+h2 {
+  border-left: 5px solid var(--brand-blue);
+  padding-left: 0.75rem;
+  margin-top: 1.8rem;
+}
+
+h3 {
+  margin-top: 1.4rem;
+}
+
+a {
+  color: var(--brand-blue);
+}
+
+.report-note {
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  border-left: 6px solid var(--brand-blue);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0 1.6rem 0;
+}
+
+.report-note strong {
+  color: var(--brand-navy);
+}
+
+.key-points {
+  background: #ffffff;
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 1.2rem 0;
+}
+
+.key-points ul {
+  margin-bottom: 0;
+}
+
+.callout.callout-style-default {
+  border-radius: 8px;
+}
+
+.table,
+table {
+  font-size: 0.94rem;
+}
+
+table caption {
+  caption-side: top;
+  color: var(--brand-navy);
+  font-weight: 700;
+  padding-bottom: 0.45rem;
+}
+
+thead th {
+  background-color: var(--brand-navy) !important;
+  color: #ffffff !important;
+  border-color: var(--brand-navy) !important;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--table-stripe);
+}
+
+.cell-output-display {
+  margin-top: 0.65rem;
+  margin-bottom: 1.2rem;
+}
+
+.cell-output-stdout,
+pre {
+  background: #f6f8fa;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+}
+
+code {
+  color: #8a4b08;
+}
+
+.figure,
+.quarto-figure {
+  margin-top: 1rem;
+  margin-bottom: 1.7rem;
+}
+
+p.caption,
+.figure-caption {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.sidebar nav[role=doc-toc] ul > li > a.active {
+  border-left: 3px solid var(--brand-blue);
+  color: var(--brand-navy) !important;
+  font-weight: 700;
+}
+
+#TOC {
+  font-size: 0.92rem;
+}
+
+.references,
+#refs {
+  font-size: 0.95rem;
+}
+</style>
+```
+
+::: report-note
+<strong>Case Study 1 — Exploratory & Inferential Analytics.</strong><br> This report analyses primary survey data collected for Peej Kitchen to understand customer meal preference, satisfaction, price sensitivity, and operational improvement opportunities.
+:::
+
 # 1. Executive Summary
 
 Peej Kitchen is a home-made catering business that prepares and delivers Nigerian meals such as Jollof Rice, Fried Rice, Oha Soup, Egusi Soup, and Ogbono Soup. This case study uses primary survey data collected from 100 respondents in May 2026 to understand the factors influencing customer meal demand, meal preference, and overall satisfaction. The dataset includes customer income range, order frequency, most ordered meal, perceived affordability, likelihood of continued purchase after a price increase, taste/quality rating, delivery time rating, portion size rating, most important purchase factor, and overall satisfaction.
 
 The analysis applies five exploratory and inferential analytics techniques: exploratory data analysis, visualisation, hypothesis testing, correlation analysis, and regression analysis. The evidence from the survey is expected to help Peej Kitchen identify its most attractive meals, understand the main drivers of satisfaction, and prioritise operational improvements. The business recommendation is to protect taste and quality as the core competitive advantage, promote high-demand meals such as Jollof Rice, monitor price sensitivity carefully, and improve operational areas such as delivery experience and portion consistency where the data shows weaker ratings.
+
+::: key-points
+**Management focus:** The report is written for a non-technical business owner. Each analysis section therefore includes the technique used, why it matters for Peej Kitchen, the R output, and a plain-language business interpretation.
+:::
 
 # 2. Professional Disclosure
 
@@ -68,10 +259,19 @@ library(kableExtra)
 library(patchwork)
 library(scales)
 
-theme_set(theme_minimal(base_size = 12))
+theme_set(
+  theme_minimal(base_size = 12) +
+    theme(
+      plot.title = element_text(face = "bold", colour = "#1f4e79"),
+      plot.subtitle = element_text(colour = "#5f6b77"),
+      axis.title = element_text(face = "bold"),
+      panel.grid.minor = element_blank()
+    )
+)
 ```
 
 ```{r load-data}
+
 peej_raw <- read_excel("data/peej_kitchen_responses.xlsx")
 
 glimpse(peej_raw)
@@ -204,7 +404,7 @@ variable_description <- tibble::tribble(
 
 variable_description %>%
   kable(caption = "Description of Variables in the Peej Kitchen Survey") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r sample-size}
@@ -223,7 +423,10 @@ tibble(
   )
 ) %>%
   kable(caption = "Dataset Size and Survey Period") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = c("striped", "hover", "condensed")
+  )
 ```
 
 # 5. Analysis Technique 1: Exploratory Data Analysis
@@ -243,7 +446,7 @@ skim(peej)
 ```{r missing-values}
 miss_var_summary(peej) %>%
   kable(caption = "Missing Value Summary") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r category-counts}
@@ -262,17 +465,17 @@ satisfaction_counts <- peej %>%
 meal_counts %>%
   mutate(percent = percent(percent, accuracy = 0.1)) %>%
   kable(caption = "Most Ordered Meals") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 
 factor_counts %>%
   mutate(percent = percent(percent, accuracy = 0.1)) %>%
   kable(caption = "Most Important Factors Influencing Meal Choice") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 
 satisfaction_counts %>%
   mutate(percent = percent(percent, accuracy = 0.1)) %>%
   kable(caption = "Overall Satisfaction Distribution") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r numeric-summary}
@@ -289,7 +492,7 @@ peej %>%
   pivot_longer(everything(), names_to = "metric", values_to = "average_score") %>%
   mutate(average_score = round(average_score, 2)) %>%
   kable(caption = "Average Scores for Ordinal Survey Variables") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ## Data quality issues and treatment
@@ -424,7 +627,7 @@ tibble(
   cramers_v = round(as.numeric(cramers_v_result$Cramers_v), 3)
 ) %>%
   kable(caption = "Hypothesis Test 1 Result") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ## Interpretation of Test 1
@@ -458,7 +661,7 @@ tibble(
   effect_size_magnitude = kruskal_effect$magnitude
 ) %>%
   kable(caption = "Hypothesis Test 2 Result") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ## Interpretation of Test 2
@@ -517,7 +720,7 @@ strong_correlations <- as.data.frame(as.table(cor_matrix)) %>%
 
 head(strong_correlations, 10) %>%
   kable(caption = "Top Correlations Among Customer Experience Variables") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ## Plain-language interpretation
@@ -564,13 +767,13 @@ model_results <- tidy(satisfaction_model, conf.int = TRUE) %>%
 
 model_results %>%
   kable(caption = "Regression Coefficients Predicting Overall Satisfaction") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 
 glance(satisfaction_model) %>%
   select(r.squared, adj.r.squared, sigma, statistic, p.value, df, df.residual) %>%
   mutate(across(where(is.numeric), ~ round(.x, 4))) %>%
   kable(caption = "Regression Model Fit") %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r regression-diagnostics, fig.height=8, fig.width=8}
@@ -614,17 +817,17 @@ With more time and data, Peej Kitchen could improve the analysis by combining su
 
 # References
 
-Adi, B. (2026). *AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R*. Lagos Business School / markanalytics.online. https://markanalytics.online
+Adi, B. (2026). *AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R*. Lagos Business School / markanalytics.online. <https://markanalytics.online>
 
-Allaire, J. J., Teague, C., Scheidegger, C., Xie, Y., & Dervieux, C. (2022). *Quarto* (Version 1.x) \[Computer software\]. https://doi.org/10.5281/zenodo.5960048
+Allaire, J. J., Teague, C., Scheidegger, C., Xie, Y., & Dervieux, C. (2022). *Quarto* (Version 1.x) \[Computer software\]. <https://doi.org/10.5281/zenodo.5960048>
 
 Fagbemi, M. O. (2026). *Peej Kitchen customer meal preference and satisfaction survey* \[Survey instrument and dataset\]. Administered to existing customers, potential customers, family, and friends, May 2026. Ethical clearance: Respondents were informed that responses would be used anonymously for an MBA analytics assignment.
 
-R Core Team. (2024). *R: A language and environment for statistical computing* (Version 4.x). R Foundation for Statistical Computing. https://www.R-project.org/
+R Core Team. (2024). *R: A language and environment for statistical computing* (Version 4.x). R Foundation for Statistical Computing. <https://www.R-project.org/>
 
-Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis*. Springer. https://doi.org/10.1007/978-3-319-24277-4
+Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis*. Springer. <https://doi.org/10.1007/978-3-319-24277-4>
 
-Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4*(43), 1686. https://doi.org/10.21105/joss.01686
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4*(43), 1686. <https://doi.org/10.21105/joss.01686>
 
 # Appendix: AI Usage Statement
 

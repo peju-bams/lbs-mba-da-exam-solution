@@ -22,7 +22,6 @@ execute:
   message: false
 ---
 
-```{=html}
 <style>
 /*
   Clean RPubs-style academic report design.
@@ -195,11 +194,12 @@ p.caption,
   font-size: 0.95rem;
 }
 </style>
-```
 
-::: report-note
-<strong>Case Study 1 — Exploratory & Inferential Analytics.</strong><br> This report analyses primary survey data collected for Peej Kitchen to understand customer meal preference, satisfaction, price sensitivity, and operational improvement opportunities.
-:::
+<div class="report-note">
+<strong>Case Study 1 — Exploratory & Inferential Analytics.</strong><br>
+This report analyses primary survey data collected for Peej Kitchen to understand customer meal preference, satisfaction, price sensitivity, and operational improvement opportunities.
+</div>
+
 
 # 1. Executive Summary
 
@@ -207,7 +207,7 @@ Peej Kitchen is a home-made catering business that prepares and delivers Nigeria
 
 The analysis applies five exploratory and inferential analytics techniques: exploratory data analysis, visualisation, hypothesis testing, correlation analysis, and regression analysis. The evidence from the survey is expected to help Peej Kitchen identify its most attractive meals, understand the main drivers of satisfaction, and prioritise operational improvements. The business recommendation is to protect taste and quality as the core competitive advantage, promote high-demand meals such as Jollof Rice, monitor price sensitivity carefully, and improve operational areas such as delivery experience and portion consistency where the data shows weaker ratings.
 
-::: key-points
+::: {.key-points}
 **Management focus:** The report is written for a non-technical business owner. Each analysis section therefore includes the technique used, why it matters for Peej Kitchen, the R output, and a plain-language business interpretation.
 :::
 
@@ -271,8 +271,17 @@ theme_set(
 ```
 
 ```{r load-data}
+# The file should be placed in a folder called "data" beside this Quarto file.
+# If you are running this inside the ChatGPT sandbox, the fallback path also works.
+file_path <- if (file.exists("data/PEEJ KITCHEN (Responses).xlsx")) {
+  "data/PEEJ KITCHEN (Responses).xlsx"
+} else if (file.exists("PEEJ KITCHEN (Responses).xlsx")) {
+  "PEEJ KITCHEN (Responses).xlsx"
+} else {
+  "/mnt/data/PEEJ KITCHEN (Responses).xlsx"
+}
 
-peej_raw <- read_excel("data/peej_kitchen_responses.xlsx")
+peej_raw <- read_excel(file_path)
 
 glimpse(peej_raw)
 ```
@@ -499,9 +508,9 @@ peej %>%
 
 The EDA revealed the following data quality issues:
 
-1.  Some response categories were written inconsistently. For example, `1-2 Monthly` and `1-2 times Monthly` both describe the same order frequency category. These were standardised into one category.
-2.  Some text responses contained spelling or capitalisation inconsistencies. For example, `Neural` was corrected to `Neutral`, `affordable` was corrected to `Affordable`, and `very Satisfying` was corrected to `Very Satisfying`.
-3.  The survey variables were mainly categorical or ordinal. For correlation and regression analysis, ordered categories were converted into numeric scores in a transparent way.
+1. Some response categories were written inconsistently. For example, `1-2 Monthly` and `1-2 times Monthly` both describe the same order frequency category. These were standardised into one category.
+2. Some text responses contained spelling or capitalisation inconsistencies. For example, `Neural` was corrected to `Neutral`, `affordable` was corrected to `Affordable`, and `very Satisfying` was corrected to `Very Satisfying`.
+3. The survey variables were mainly categorical or ordinal. For correlation and regression analysis, ordered categories were converted into numeric scores in a transparent way.
 
 ## Plain-language interpretation
 
@@ -803,11 +812,11 @@ The overall recommendation is that Peej Kitchen should treat taste and meal qual
 
 A practical action plan is:
 
-1.  Maintain quality consistency by standardising recipes, cooking process, and ingredient selection.
-2.  Use Jollof Rice and other high-demand meals as flagship offerings in promotions.
-3.  Avoid sudden price increases; if prices must increase, communicate the reason clearly and consider bundle options.
-4.  Monitor delivery time and portion size because these affect the total customer experience.
-5.  Repeat this survey periodically to track changes in customer satisfaction and demand over time.
+1. Maintain quality consistency by standardising recipes, cooking process, and ingredient selection.
+2. Use Jollof Rice and other high-demand meals as flagship offerings in promotions.
+3. Avoid sudden price increases; if prices must increase, communicate the reason clearly and consider bundle options.
+4. Monitor delivery time and portion size because these affect the total customer experience.
+5. Repeat this survey periodically to track changes in customer satisfaction and demand over time.
 
 # 11. Limitations and Further Work
 
@@ -817,17 +826,17 @@ With more time and data, Peej Kitchen could improve the analysis by combining su
 
 # References
 
-Adi, B. (2026). *AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R*. Lagos Business School / markanalytics.online. <https://markanalytics.online>
+Adi, B. (2026). *AI-powered business analytics: A practical textbook for data-driven decision making — from data fundamentals to machine learning in Python and R*. Lagos Business School / markanalytics.online. https://markanalytics.online
 
-Allaire, J. J., Teague, C., Scheidegger, C., Xie, Y., & Dervieux, C. (2022). *Quarto* (Version 1.x) \[Computer software\]. <https://doi.org/10.5281/zenodo.5960048>
+Allaire, J. J., Teague, C., Scheidegger, C., Xie, Y., & Dervieux, C. (2022). *Quarto* (Version 1.x) [Computer software]. https://doi.org/10.5281/zenodo.5960048
 
-Fagbemi, M. O. (2026). *Peej Kitchen customer meal preference and satisfaction survey* \[Survey instrument and dataset\]. Administered to existing customers, potential customers, family, and friends, May 2026. Ethical clearance: Respondents were informed that responses would be used anonymously for an MBA analytics assignment.
+Fagbemi, M. O. (2026). *Peej Kitchen customer meal preference and satisfaction survey* [Survey instrument and dataset]. Administered to existing customers, potential customers, family, and friends, May 2026. Ethical clearance: Respondents were informed that responses would be used anonymously for an MBA analytics assignment.
 
-R Core Team. (2024). *R: A language and environment for statistical computing* (Version 4.x). R Foundation for Statistical Computing. <https://www.R-project.org/>
+R Core Team. (2024). *R: A language and environment for statistical computing* (Version 4.x). R Foundation for Statistical Computing. https://www.R-project.org/
 
-Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis*. Springer. <https://doi.org/10.1007/978-3-319-24277-4>
+Wickham, H. (2016). *ggplot2: Elegant graphics for data analysis*. Springer. https://doi.org/10.1007/978-3-319-24277-4
 
-Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4*(43), 1686. <https://doi.org/10.21105/joss.01686>
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4*(43), 1686. https://doi.org/10.21105/joss.01686
 
 # Appendix: AI Usage Statement
 
@@ -837,10 +846,10 @@ I used ChatGPT as an AI coding and writing assistant to support the structure of
 
 For the oral defence, I should be able to explain the following:
 
-1.  **Why this dataset is real primary data:** It was collected through Google Forms from customers, potential customers, family, and friends familiar with Peej Kitchen.
-2.  **Why EDA was used:** It helped me understand the structure, missing values, inconsistencies, and basic patterns in the survey data.
-3.  **Why visualisation was used:** It helped communicate meal preference, satisfaction, affordability, and quality patterns clearly.
-4.  **Why hypothesis testing was used:** It helped test whether relationships in the sample are statistically meaningful.
-5.  **Why Spearman correlation was used:** The survey variables are ordinal scores, so Spearman is more appropriate than Pearson.
-6.  **Why regression was used:** It helped estimate which customer experience factors predict overall satisfaction.
-7.  **Main business implication:** Peej Kitchen should protect taste/quality as its main advantage while improving delivery, portion consistency, and price communication.
+1. **Why this dataset is real primary data:** It was collected through Google Forms from customers, potential customers, family, and friends familiar with Peej Kitchen.
+2. **Why EDA was used:** It helped me understand the structure, missing values, inconsistencies, and basic patterns in the survey data.
+3. **Why visualisation was used:** It helped communicate meal preference, satisfaction, affordability, and quality patterns clearly.
+4. **Why hypothesis testing was used:** It helped test whether relationships in the sample are statistically meaningful.
+5. **Why Spearman correlation was used:** The survey variables are ordinal scores, so Spearman is more appropriate than Pearson.
+6. **Why regression was used:** It helped estimate which customer experience factors predict overall satisfaction.
+7. **Main business implication:** Peej Kitchen should protect taste/quality as its main advantage while improving delivery, portion consistency, and price communication.
